@@ -1,25 +1,23 @@
-# git-server-docker
-A lightweight Git Server Docker image built with Alpine Linux. Available on [GitHub](https://github.com/jkarlosb/git-server-docker) and [Docker Hub](https://hub.docker.com/r/jkarlos/git-server-docker/)
+# gitasservice-k8S
+A lightweight Git Server Docker image built with Alpine Linux. Available on [GitHub](https://github.com/samuel-sujith/gitasservice-k8s) and [Docker Hub](https://hub.docker.com/r/samuelsujith/gitindocker/)
 
-!["image git server docker" "git server docker"](https://raw.githubusercontent.com/jkarlosb/git-server-docker/master/git-server-docker.jpg)
 
 ### Basic Usage
 
-How to run the container in port 2222 with two volumes: keys volume for public keys and repos volume for git repositories:
-
-	$ docker run -d -p 2222:22 -v ~/git-server/keys:/git-server/keys -v ~/git-server/repos:/git-server/repos jkarlos/git-server-docker
+Copy the ssh-key id_rsa.pub from the server which will connect to the git and replace in the configmap in deploy.yaml
 
 How to use a public key:
-
     Copy them to keys folder: 
-	- From host: $ cp ~/.ssh/id_rsa.pub ~/git-server/keys
-	- From remote: $ scp ~/.ssh/id_rsa.pub user@host:~/git-server/keys
-	You need restart the container when keys are updated:
-	$ docker restart <container-id>
+	- From kubernetes: $ kubectl cp <pod-name-from-where-to-access-gitservice>:~/.ssh/id_rsa.pub .
+					   $ kubectl cp ./id_rsa.pub <pod-name-for-gitservice>:~/git-server/repos
+
+Run the below
+ kubectl apply -f deploy.yaml
+ kubectl apply -f svc.yaml
 	
 How to check that container works (you must to have a key):
 
-	$ ssh git@<ip-docker-server> -p 2222
+	$ ssh git@<git-svc-address>
 	...
 	Welcome to git-server-docker!
 	You've successfully authenticated, but I do not
@@ -28,23 +26,20 @@ How to check that container works (you must to have a key):
 
 How to create a new repo:
 
-	$ cd myrepo
-	$ git init --shared=true
-	$ git add .
-	$ git commit -m "my first commit"
-	$ cd ..
-	$ git clone --bare myrepo myrepo.git
+On a local machine
 
-How to upload a repo:
+	$ mkdir myrepo.git
+	$ cd myrepo.git
+	$ git init --baare
+
+How to upload a repo to kubernetes
 
 	From host:
-	$ mv myrepo.git ~/git-server/repos
-	From remote:
-	$ scp -r myrepo.git user@host:~/git-server/repos
+	$ kubectl cp ./myrepo.git <pod-name-for-gitservice>:/git-server/repos -n <git workspace
 
 How clone a repository:
 
-	$ git clone ssh://git@<ip-docker-server>:2222/git-server/repos/myrepo.git
+	$ git clone ssh://git@<git-svc-address>:/git-server/repos/myrepo.git
 
 ### Arguments
 
@@ -69,8 +64,3 @@ How to make the image:
 
 	$ docker build -t git-server-docker .
 	
-### Docker-Compose
-
-You can edit docker-compose.yml and run this container with docker-compose:
-
-	$ docker-compose up -d
