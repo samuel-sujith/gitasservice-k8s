@@ -1,5 +1,5 @@
 # gitasservice-k8S
-This repo extends the service provided by [Github]https://github.com/jkarlosb/git-server-docker and adds ability to deploy on K8s
+This repo extends the service provided by [Github](https://github.com/jkarlosb/git-server-docker) and adds ability to deploy on K8s
 
 A lightweight Git Server Docker image built with Alpine Linux. Available on [GitHub](https://github.com/samuel-sujith/gitasservice-k8s) and [Docker Hub](https://hub.docker.com/r/samuelsujith/gitindocker/)
 
