@@ -10,9 +10,11 @@ Copy the ssh-key id_rsa.pub from the server which will connect to the git and re
 
 How to use a public key:
     Copy them to keys folder: 
+	...
 	- From kubernetes: 
-	$ kubectl cp <pod-name-from-where-to-access-gitservice>:~/.ssh/id_rsa.pub <you public key location>
+	$ kubectl cp <pod-name-from-where-to-access-gitservice>:<public key location inside .ssh folder> <you public key location>
 	$ kubectl cp <your public key location> <pod-name-for-gitservice>:~/git-server/repos
+	...
 
 Run the below
  kubectl apply -f deploy.yaml
