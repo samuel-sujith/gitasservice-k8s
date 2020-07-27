@@ -9,9 +9,9 @@ A lightweight Git Server Docker image built with Alpine Linux. Available on [Git
 Copy the ssh-key id_rsa.pub from the server which will connect to the git and replace in the configmap in deploy.yaml
 
 How to use a public key:
-    Copy them to keys folder: 
-	...
+    Copy them to keys folder:
 	- From kubernetes: 
+	...
 	$ kubectl cp <pod-name-from-where-to-access-gitservice>:<public key location inside .ssh folder> <you public key location>
 	$ kubectl cp <your public key location> <pod-name-for-gitservice>:~/git-server/repos
 	...
