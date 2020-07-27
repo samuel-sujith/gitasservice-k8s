@@ -1,0 +1,48 @@
+apiVersion: v1
+data:
+  id_rsa.pub: |
+    ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8XDhtuI+SO6JEGAMml86HSY0fBZDc0fEOao5ONRq5tJ8A36wFzLzSicTULGzLwxBmS6SDxRw15w33LwHkOZxZP1ZSNwVpbCwDqjmA5fJEm9Vd6tzWCElUQyKegDd5Pzka7wXptElquMugfqO82s3sK2mItqhlG9Kkd96Y1sZjNyqERev1aXTv5wEOVXyTT68j/5svTdr0KrT954Vvvhx1KX6IpVv8NITDlYQmAZ8lkYDwLQSWmlJvqH/lj284Z8p+eib6x/1k06LxmcWxKYp0Zmev3NbcffU3emW+CO/lvYJexeMQkIi62jNjiwftADoCHk/RQcxC/tJAww1JBNvDrpuFU4WXnBME9J/HvE/sllR1SVAaFXXYMfuAUVrY65oou5C/ZaVYKfPXA8h1R2lChoTZZpPWAsGnpfybN2vWDa0WvpObkwQCx86+fnyYRoIq7xXh35YDfo2t9KIezFZiU6pbsNumG+tUNlCaHfZK0PiO4vMC584wBlP4QPVTFFqsF9VOAAP9zS0Syiv27fcpxGRbaffqCxs1SN+TDv8UtDDraFtYylKtWwXGYYDaT4r2DrRfWUl/+ChlveCAz0pYcSenBbbV8uQctc3Lo4psuD7TSQCN1lh79Xb/zGfZWzixvpaEHNl8Xl3W6D+VHRoV2IkM5wHRMuCutB4rw65AoQ== git@runner.com
+kind: ConfigMap
+metadata:
+  name: gitindocker-authkeys-cm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-deployment
+  labels:
+    app: git
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: git
+  template:
+    metadata:
+      labels:
+        app: git
+    spec:
+      containers:
+      - name: git
+        image: samuelsujith/gitindocker:25Jul2020
+        imagePullPolicy: Always
+        env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+        ports:
+        - containerPort: 22
+        volumeMounts:
+        - mountPath: /git-server/keys/
+          name: authorized-keys
+        - mountPath: /git-server/repos
+          name: repo-volume
+      volumes:
+        - name: repo-volume
+          persistentVolumeClaim:
+            claimName: task-pv-claim-gitrepo
+        - configMap:
+            name: gitindocker-authkeys-cm
+          name: authorized-keys
+
